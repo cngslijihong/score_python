@@ -1,0 +1,84 @@
+  997  ls /usr/local/webserver/nginx/conf/nginx.conf.default 
+  998  vim /usr/local/webserver/nginx/conf/nginx.conf.default 
+  999  ls
+ 1002  ps aux | grep uwsgi
+ 1003  uwsgi --ini uwsgi.ini 
+ 1004  ps aux | grep uwsgi
+ 1005  uwsgi --ini uwsgi.ini 
+ 1014  ps aux | grep uwsgi
+ 1016  uwsgi --ini uwsgi.ini 
+ 1020  ps -ef | grep uwsgi
+ 1026  ls /usr/local/webserver/nginx/conf/us*.*
+ 1028  ls /usr/local/webserver/nginx/conf/uwsgi_params
+ 1029  cat /usr/local/webserver/nginx/conf/uwsgi_params
+ 1030  lsof -i :8001 
+ 1031  uwsgi --ini uwsgi.ini 
+ 1032  ps aux | grep uwsgi
+ 1033  ps -ef | grep uwsgi
+ 1043  cd uwsgi_conf/uwsgi.log 
+ 1044  vim uwsgi_conf/uwsgi.log 
+ 1046  lsof -i :8000
+ 1047  ps -ef | grep uwsgi
+ 1055  lsof -i :8000
+ 1056  ls uwsgi_conf/uwsgi.pid 
+ 1057  cat uwsgi_conf/uwsgi.pid 
+ 1058  ps aux | grep uwsgi
+ 1059  cat uwsgi_conf/uwsgi.pid 
+ 1060  uwsgi --stop uwsgi_conf/uwsgi.pid 
+ 1063  lsof -i :8000
+ 1067  ls /usr/local/webserver/nginx/conf/
+ 1068  ls /usr/local/webserver/nginx/conf/nginx.conf.default 
+ 1069  vim /usr/local/webserver/nginx/conf/nginx.conf.default 
+ 1080  ps aux | grep uWSGI
+ 1081  vim /usr/local/webserver/nginx/conf/nginx.conf.default 
+ 1082  ls /usr/local/webserver/nginx/conf/nginx.conf.default 
+ 1083  ls /usr/local/webserver/nginx/conf/
+ 1084  ls /usr/local/webserver/nginx/conf/nginx.conf.bak 
+ 1085  vim /usr/local/webserver/nginx/conf/nginx.conf.bak 
+ 1086  vim /usr/local/webserver/nginx/conf/nginx.conf.default 
+ 1087  service nginx restart
+ 1088  uwsgi --http :8083 --wsgi-file manager.py
+ 1089  ls uwsgi_conf/uwsgi.log 
+ 1090  vat uwsgi_conf/uwsgi.log 
+ 1091  cat uwsgi_conf/uwsgi.log 
+ 1092  uwsgi --python-version
+ 1093* 
+ 1100  python manage.py runserver 9000
+ 1101  pip3 install xadmin-2.0.1
+ 1102  cd ..
+ 1103  ls
+ 1104  pip3 install xadmin-django2.zip
+ 1105  cd score/
+ 1133  pip install wechatpy
+ 1134  ls ~/.pip/pip.conf
+ 1135  ls ~/.pip
+ 1136  ls ~/.pip/pip.conf
+ 1143  python manage.py runserver 9000
+ 1144  pip install cryptography==2.7
+ 1145* 
+ 1146  lsof -i :9000
+ 1147  python manage.py runserver 8001
+ 1148  python manage.py runserver :9000
+ 1149  python manage.py runserver :9001
+ 1150  python manage.py runserver 9001
+ 1151  uwsgi --python-version
+ 1152  python manage.py runserver
+ 1153  uwsgi --ini uwsgi.ini 
+ 1154  python manage.py runserver 9001
+ 1155  python manage.py runserver 192.168.1.4:9001
+ 1156  vim uwsgi.ini 
+ 1158  lsof -i :8000
+ 1167  uwsgi --stop uwsgi_conf/uwsgi.pid 
+ 1168  lsof -i :8000
+ 1170  ps aux|grep uWSGI
+ 1173  ps aux|grap uWSGI
+ 1174  ps aux|grep uWSGI
+ 1175  uwsgi --reload uwsgi_conf/uwsgi.pid 
+ 1176  uwsgi --reload uwsgi_conf/uwsgi.pid
+ 1177  ps aux|grep uWSGI
+ 1178  cat  uwsgi_conf/uwsgi.pid 
+ 1180  ps aux|grep uWSGI
+ 1183  pkill -f uwsgi 
+ 1185  pkill -f score_app*
+ 1186  ps aux|grep uWSGI
+ 1187  lsof -i :8000

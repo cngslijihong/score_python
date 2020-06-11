@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Knockout js cascading dropdown example</title>
+    <script src="jquery-1.6.3.min.js" type="text/javascript"></script>
+    <script src="knockout-1.2.1.js" type="text/javascript"></script>
+    <script>
+        var viewModel = {
+            country: ko.observable(),
+            countries: ko.observableArray(),
+            state: ko.observable(),
+            states: ko.observableArray(),
+            city: ko.observable(),
+            cities: ko.observableArray(),
+            result: ko.observable()
+        };
+        viewModel.countrySelect = ko.dependentObservable({
+            read: viewModel.country,
+            write: function (country) {
+                this.country(country);
+                $.getJSON('http://localhost:56502/KnockoutJS/CascadingDropdown/States/' +
+                    country.value, null, function (response) {
+                    viewModel.states(response);
+                });
+            },
+            owner: viewModel
+        });
+        viewModel.stateSelect = ko.dependentObservable({
+            read: viewModel.state,
+            write: function (state) {
+                this.state(state);
+                $.getJSON('http://localhost:56502/KnockoutJS/CascadingDropdown/Cities/' +
+                    state.value, null, function (response) {
+                    viewModel.cities(response);
+                });
+            },
+            owner: viewModel
+        });
+        viewModel.result = ko.dependentObservable(function () {
+            var result = '';
+            result += this.country() != undefined ? 'Country: ' + this.country().text + ', ' : '';
+            result += this.state() != undefined ? 'State: ' + this.state().text + ', ' : '';
+            result += this.city() != undefined ? 'City: ' + this.city().text : '';
+            return result;
+        }, viewModel);
+
+        $(function () {
+            $.getJSON('http://localhost:56502/KnockoutJS/CascadingDropdown/Countries/',
+                null, function (response) {
+                    viewModel.countries(response);
+                });
+            ko.applyBindings(viewModel);
+        });
+    </script>
+    <head>
+<body>
+<h1>Knockout js cascading dropdown example</h1>
+<select data-bind="options: countries, optionsCaption: 'Choose country...',
+            optionsValue: function(item) { return item.value; },
+            optionsText: function(item) { return item.text; }, value: countrySelect,
+            valueUpdate: 'change'" id="Country" name="Country"></select>
+<select data-bind="options: states, optionsCaption: 'Choose state...',
+            optionsValue: function(item) { return item.value; },
+            optionsText: function(item) { return item.text; }, value: stateSelect,
+            valueUpdate: 'change'" id="State" name="State"></select>
+<select data-bind="options: cities, optionsCaption: 'Choose city...',
+            optionsValue: function(item) { return item.value; },
+            optionsText: function(item) { return item.text; }, value: city,
+            valueUpdate: 'change'" id="State" name="City"></select>
+<span data-bind="text: result"></span>
+</body>
+</html>
+
+
+
+ <!-- ASP.NET MVC3
+    ================================================== -->
+
+  <!--
+For example, your ASP.NET MVC3 action could look like this:
+
+public JsonResult States(string country)
+{
+    var states = _countryRepository.GetStates(country)
+        .Select(s => new {
+            text = s.StateName,
+            value = c.StateCode
+        });
+    return Json(states, JsonRequestBehavior = JsonRequestBehavior.AllowGet);
+}
+-->

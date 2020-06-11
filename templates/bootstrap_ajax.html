@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    $(function(){
+        var shebeiId="GPRS_TEST";
+	    var startTime=$("#startTimePart").val() + ':00';
+	    var endTime=$("#endTimePart").val() + ':00 ';
+	    oneJsTest.reqShebeiDataByShebeiAndTimePart(shebeiId,startTime,endTime);
+    });
+
+var oneJsTest={
+	/**
+	 * 根据设备号、起始时间，请求后台数据，并生成表格
+	 */
+	reqShebeiDataByShebeiAndTimePart:function(shebeiIdParam,startTimeParam,endTimeParam){
+		$.ajax({
+			type: "POST",
+			url:G.contextPath + '/live/listShebeDataByShebeiAndTime.do',
+			data:{shebeiId:shebeiIdParam,startTime:startTimeParam,endTime:endTimeParam},
+			dataType: "json",
+			success: function(data){
+				oneJsTest.createShebeiDataTablePart(data.shebeiData);
+			}
+		});
+	},
+	/**
+	 * 生成固定表头表格
+	 */
+	createShebeiDataTablePart:function(data){
+		$('#shuzhi_row_quxian_tb').bootstrapTable('destroy').bootstrapTable({
+			data:data,
+			height:640,
+			striped: true,                 // 是否显示行间隔色
+			cache: false,                  // 是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+			//pagination: true,            //是否显示分页（*）
+			sortOrder: "asc",              //排序方式
+			uniqueId:"jlh",
+			sidePagination: "client",      //分页方式：client客户端分页，server服务端分页（*）
+			pageNumber:1,                  //初始化加载第一页，默认第一页
+			pageSize: 6,                   //每页的记录行数（*）
+			pageList: [10, 25, 50, 100],   //可供选择的每页的行数（*）
+			paginationPreText: "上一页",
+			paginationNextText: "下一页",
+			clickToSelect: true,           //是否启用点击选中行
+			gridview: true,                //加速显示
+			columns:[{
+					field: 'rq',
+					title: '日期',formatter:function(value,row,index){
+						return value.split(" ")[0];
+					}
+				},{
+					field: 'rq',
+					title: '时间',formatter:function(value,row,index){
+						return value.split(" ")[1];
+					}
+				}, {
+					field: 'turangShidu',
+					title: '湿度'
+				},{
+					field: 'wendu',
+					title: '温度'
+				},{
+					field: 'guangzhaodu',
+					title: '光照'
+				}]
+		});
+	},
+}
+</script>
+
+</body>
+</html>

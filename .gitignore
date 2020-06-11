@@ -1,0 +1,22 @@
+.DS_Store
+.idea
+venv/
+static/
+__pycache__
+__init__
+migrations
+obj
+bin
+*.pyc
+**/*.log
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.local
+
+package-lock.json

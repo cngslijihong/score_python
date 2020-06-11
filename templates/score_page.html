@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block mainbody %}
+    {% load static %}
+    <nav class="navbar navbar-fixed-top">
+        <div class="navbar-header">
+            <button type="button" class="btn btn-info btn-lg btn-block" data-toggle="collapse"
+                    data-target="#cascadingDropdown">
+                隐藏/显示
+            </button>
+        </div>
+
+         <div class="navbar-right">
+           <a  data-bind="attr:{href: ex_url_score}"><button type="button" class="btn btn-info btn-lg btn-block">导出EXCEL</button></a>
+        </div>
+
+        <div id="cascadingDropdown" class="container">
+            <div class="row">
+                <div class="col-md-2 col-sx-2">
+                    <select class="form-control" data-bind="options: routes, optionsCaption: '--信息类型:--',
+            optionsValue: function(item) { return item.index; },
+            optionsText: function(item) { return item.txt; }, value: routeSelect,
+            valueUpdate: 'change'" id="routes" name="routes"></select>
+                </div>
+                <div class="col-md-2 col-sx-2">
+                    <select class="form-control" data-bind="options: grades, optionsCaption: '--年级--',
+            optionsValue: function(item) { return item.grade_id; },
+            optionsText: function(item) { return item.grade_name; }, value: gradeSelect,
+            valueUpdate: 'change'" id="Grade" name="Grade"></select>
+                </div>
+                <div class="col-md-2 col-sx-2">
+                    <select class="form-control" data-bind="options: classes, optionsCaption: '--班级--',
+            optionsValue: function(item) { return item.class_id; },
+            optionsText: function(item) { return item.class_name; }, value: class_Select,
+            valueUpdate: 'change'" id="Class_" name="Class"></select>
+                </div>
+                <div class="col-md-2 col-sx-2">
+                    <select class="form-control" data-bind="options: exams, optionsCaption: '--考试--',
+            optionsValue: function(item) { return item.exam_id; },
+            optionsText: function(item) { return item.exam_title; }, value: examSelect,
+            valueUpdate: 'change'" id="Exam" name="Exam"></select>
+                </div>
+                <div class="col-md-2 col-sx-2">
+                    <select class="form-control" data-bind="options: courses, optionsCaption: '--全科--',
+            optionsValue: function(item) { return item.course_id; },
+            optionsText: function(item) { return item.course_name; }, value: courseSelect,
+            valueUpdate: 'change'" id="Course" name="Course"></select>
+                </div>
+                <div class="col-md-1 col-sx-1">
+                    <button id="btn_query" type="button" class="btn btn-success" data-bind="enable:fnQueryEnable">查询
+                    </button>
+                </div>
+            </div>
+            <!--<div id="navbar" class="col-md-10 column navbar-collapse collapse">
+                <span id="url_score" data-bind="text: url_score"></span>
+            </div> -->
+        </div>
+        </div>
+    </nav>
+
+    <div class="main container-fluid">
+        <table id="score_tab" class="table table-responsive table-striped
+    table-bordered table-hover table-condensed ">
+        </table>
+    </div>
+
+    <script type="text/javascript">
+        var viewModel = {
+            routeIndex: ko.observable(),
+            routes: ko.observableArray(),
+            gradeIndex: ko.observable(),
+            grade: ko.observable(),
+            grades: ko.observableArray(),
+            classIndex: ko.observable(),
+            class_: ko.observable(),
+            classes: ko.observableArray(),
+            examIndex: ko.observable(),
+            exam: ko.observable(),
+            exams: ko.observableArray(),
+            courseIndex: ko.observable(),
+            course: ko.observable(),
+            courses: ko.observableArray(),
+            ex_url_score: ko.observable()
+        };
+        viewModel.routeSelect = ko.dependentObservable({
+            read: viewModel.routeIndex,
+            write: function (index) {
+                this.routeIndex(index);
+                switch (index) {
+                    case 0:
+                        $("#Class_").show();
+                        $("#Course").hide();
+                        break;
+                    case 1:
+                        $("#Class_").hide();
+                        $("#Course").show();
+                        break;
+                    case 2:
+                        $("#Class_").hide();
+                        $("#Course").hide();
+                        break;
+                    default:
+                }
+            },
+            owner: viewModel
+        });
+        viewModel.gradeSelect = ko.dependentObservable({
+            read: viewModel.grade,
+            write: function (grade) {
+                this.grade(grade);
+                this.gradeIndex(this.grades().findIndex((item) => {
+                    return item.grade_id == this.grade()
+                }));
+                $.getJSON('/classes/' + grade, null, function (response) {
+                    viewModel.classes(response);
+                });
+                $.getJSON('/exams/' + grade, null, function (response) {
+                    viewModel.exams(response);
+                });
+            },
+            owner: viewModel
+        });
+        viewModel.examSelect = ko.dependentObservable({
+            read: viewModel.exam,
+            write: function (exam) {
+                this.exam(exam);
+                this.examIndex(this.exams().findIndex((item) => {
+                    return item.exam_id == this.exam()
+                }));
+                if (exam != undefined)
+                    $.getJSON('/courses/' + this.grade() + '/' + exam, null, function (response) {
+                        viewModel.courses(response);
+                    });
+            },
+            owner: viewModel
+        });
+        viewModel.class_Select = ko.dependentObservable({
+            read: viewModel.class_,
+            write: function (class_) {
+                this.class_(class_);
+                this.classIndex(this.classes().findIndex((item) => {
+                    return item.class_id == this.class_()
+                }));
+            },
+            owner: viewModel
+        });
+        viewModel.courseSelect = ko.dependentObservable({
+            read: viewModel.course,
+            write: function (course) {
+                this.course(course);
+                this.courseIndex(this.courses().findIndex((item) => {
+                    return item.course_id == this.course()
+                }));
+            },
+            owner: viewModel
+        });
+
+        viewModel.url_score = ko.pureComputed(function () {
+            var route = '/' + this.routes()[this.routeIndex()].route;
+            var ex_route = '/' + this.routes()[this.routeIndex()].ex_route;
+            var param;
+            switch (this.routeIndex()) {
+                case 0:
+                    param=(this.grade() != undefined ? '/' + this.grade() : '') +
+                        (this.class_() != undefined ? '/' + this.class_() : '') +
+                        (this.exam() != undefined ? '/' + this.exam() : '');
+                    break;
+                case 1:
+                    param=(this.grade() != undefined ? '/' + this.grade() : '') +
+                        (this.course() != undefined ? '/' + this.course() : '/0') +
+                        (this.exam() != undefined ? '/' + this.exam() : '');
+                    break;
+                case 2:
+                    param=(this.grade() != undefined ? '/' + this.grade() : '') +
+                        (this.exam() != undefined ? '/' + this.exam() : '');
+                    break;
+                default:
+            }
+            ;
+            this.ex_url_score(ex_route+param);
+            return route+param;
+        }, viewModel);
+        viewModel.pageTitle = ko.pureComputed(function () {
+            var title="";
+            switch (this.routeIndex()) {
+                case 0:
+                    title =this.grades()[this.gradeIndex()].grade_name+
+                        this.classes()[this.classIndex()].class_name+
+                        this.exams()[this.examIndex()].exam_title+
+                        this.routes()[this.routeIndex()].txt
+                    break;
+                case 1:
+                    title =this.grades()[this.gradeIndex()].grade_name+
+                        this.exams()[this.examIndex()].exam_title+
+                         (this.course() != undefined ?  this.courses()[this.courseIndex()].course_name : '')+
+                        this.routes()[this.routeIndex()].txt
+                    break;
+                case 2:
+                    title =this.grades()[this.gradeIndex()].grade_name+
+                        this.exams()[this.examIndex()].exam_title+
+                        this.routes()[this.routeIndex()].txt
+                    break;
+                default:
+            }
+            return title.replace(/\s*/g,"");
+        }, viewModel);
+
+        viewModel.fnQueryEnable =  ko.pureComputed(function () {
+            switch (this.routeIndex()) {
+                case 0:
+                    return (this.grade() != undefined) && (this.class_() != undefined) && (this.exam() != undefined);
+                    break;
+                case 1:
+                    return (this.grade() != undefined) && (this.exam() != undefined);
+                    break;
+                case 2:
+                    return (this.grade() != undefined) && (this.exam() != undefined);
+            };
+        }, viewModel);
+
+        ko.applyBindings(viewModel);
+
+        $.getJSON('/grades/', null, function (response) {
+            viewModel.grades(response);
+        });
+        $.getJSON('/routes/', null, function (response) {
+            viewModel.routes(response);
+        });
+
+       //  function jump(){
+        //window.location.href=viewModel.ex_url_score();
+       // window.location.href="http://192.168.1.2:8000/ex_scores/172/15/1"
+       // }
+
+    </script>
+  <script>
+
+        document.getElementById("btn_query").onclick = buildTable;
+
+        function buildTable() {
+            document.title = viewModel.pageTitle();
+            $('#score_tab').bootstrapTable('destroy');
+            $("#score_tab").bootstrapTable({
+                ajax: ajaxReq
+            });
+        };
+
+        function ajaxReq(result) {
+            $.ajax({
+                type: "GET",
+                url: viewModel.url_score(),
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                json: 'callback',
+                success: function (response) {
+                    $('#score_tab').bootstrapTable('destroy').bootstrapTable({
+                        data: response.data,
+                        //toolbar: '#toolbar',
+                        singleSelect: true,
+                        //search: true,
+                        //toolbar: '.toolbar',
+                        fixedColumns: viewModel.routeIndex()> 0,
+                        fixedNumber: 5,
+                        columns: buildColumns(response.data)
+                    });
+
+                },
+                error: function () {
+                    alert("获取服务器数据出错!");
+                }
+            });
+        };
+
+        function buildColumns(json) {
+            var columnsArray = [];
+            // columnsArray.push({field: "state", checkbox: true});
+            for (var i = 0; i < (Object.keys(json[0])).length; i++) {
+                var property = (Object.keys(json[0]))[i];
+                columnsArray.push({
+                    "title": property,
+                    "field": property,
+                    switchable: true,
+                    sortable: true
+                });
+            }
+            ;
+            return columnsArray
+        }
+    </script>
+{% endblock %}
